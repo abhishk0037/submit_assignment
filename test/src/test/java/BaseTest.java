@@ -1,5 +1,6 @@
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.annotations.AfterMethod;
@@ -14,15 +15,33 @@ import java.util.Map;
 public class BaseTest {
     protected static ThreadLocal<WebDriver> driver = new ThreadLocal<>();
 
-    public static final String USERNAME = "abhishekydv9099";
-    public static final String ACCESS_KEY = "suKmJKnxMzXZ5a0AqZSzc85Dow8lYUKw9nw4fUYJPxMvB1hUXu";
-    public static final String GRID_URL = "@hub.lambdatest.com/wd/hub";
+    private static final String USERNAME = "abhishekydv9099";
+    private static final String ACCESS_KEY = "suKmJKnxMzXZ5a0AqZSzc85Dow8lYUKw9nw4fUYJPxMvB1hUXu";
+    private static final String GRID_URL = "@hub.lambdatest.com/wd/hub";
 
     @BeforeMethod
-    @Parameters({"browser", "version", "platform"})
-    public void setup(String browser, String version, String platform) throws MalformedURLException {
-//        driver.set(new ChromeDriver());
-//        driver.get().manage().window().maximize();
+    @Parameters({"browser", "version", "platform", "executionMode"})
+    public void setup(String browser, String version, String platform, String executionMode) throws MalformedURLException {
+        if (executionMode.equalsIgnoreCase("local")) {
+            if (browser.equalsIgnoreCase("chrome")) {
+                driver.set(new ChromeDriver());
+            } else if (browser.equalsIgnoreCase("firefox")) {
+                driver.set(new FirefoxDriver());
+            } else {
+                throw new IllegalArgumentException("Unsupported browser: " + browser);
+            }
+            driver.get().manage().window().maximize();
+        } else if (executionMode.equalsIgnoreCase("lambdatest")) {
+            DesiredCapabilities capabilities = getDesiredCapabilities(browser, version, platform);
+
+            driver.set(new RemoteWebDriver(new URL("https://" + USERNAME + ":" + ACCESS_KEY + GRID_URL), capabilities));
+        }
+        else {
+            throw new IllegalArgumentException("Invalid execution mode: " + executionMode);
+        }
+    }
+
+    private DesiredCapabilities getDesiredCapabilities(String browser, String version, String platform) {
         DesiredCapabilities capabilities = new DesiredCapabilities();
         capabilities.setCapability("browserName", browser);
         capabilities.setCapability("browserVersion", version);
@@ -34,8 +53,7 @@ public class BaseTest {
         ltOptions.put("name", "SearchProductTest");
 
         capabilities.setCapability("LT:Options", ltOptions);
-
-        driver.set(new RemoteWebDriver(new URL("https://" + USERNAME + ":" + ACCESS_KEY + GRID_URL), capabilities));
+        return capabilities;
     }
 
     @AfterMethod
