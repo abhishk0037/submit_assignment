@@ -9,13 +9,13 @@
             <class name="SearchProduct"/>
         </classes>
     </test>
-    <test name="ParallelProductTests">
-        <parameter name="browser" value="Chrome"/>
-        <parameter name="version" value="latest"/>
-        <parameter name="platform" value="Windows 11"/>
-        <parameter name="executionMode" value="lambdatest"/>
-        <classes>
-            <class name="SearchProduct" />
-        </classes>
-    </test>
+<!--    <test name="ParallelProductTests">-->
+<!--        <parameter name="browser" value="Chrome"/>-->
+<!--        <parameter name="version" value="latest"/>-->
+<!--        <parameter name="platform" value="Windows 11"/>-->
+<!--        <parameter name="executionMode" value="lambdatest"/>-->
+<!--        <classes>-->
+<!--            <class name="SearchProduct" />-->
+<!--        </classes>-->
+<!--    </test>-->
 </suite>
