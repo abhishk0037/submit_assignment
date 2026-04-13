@@ -32,7 +32,7 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh "mvn -f test/pom.xml ${MVN_COMMON} -DskipTests clean package"
+                sh "mvn -f test/pom.xml test -Dsurefire.suiteXmlFiles=testng.xml"
             }
         }
 
@@ -52,7 +52,7 @@ pipeline {
         stage('PublishReports') {
             steps {
                 // Publish JUnit/Surefire XML results and TestNG XML if present.
-                junit testResults: 'test/target/surefire-reports/*.xml, test/test-output/testng-results.xml', allowEmptyResults: true
+                junit testResults: '**/target/surefire-reports/*.xml', allowEmptyResults: true
 
                 script {
                     if (fileExists('test/test-output/index.html')) {
@@ -81,7 +81,7 @@ pipeline {
     post {
         always {
             // Attempt to publish results again (won't fail pipeline if none)
-            junit testResults: 'test/target/surefire-reports/*.xml, test/test-output/testng-results.xml', allowEmptyResults: true
+            junit testResults: '**/target/surefire-reports/*.xml', allowEmptyResults: true
             // Ensure artifacts are archived at least once
             archiveArtifacts artifacts: 'test/target/**/*', allowEmptyArchive: true
             // Clean workspace if Workspace Cleaner plugin is available
