@@ -57,7 +57,7 @@ pipeline {
                     if (fileExists('test/test-output/index.html')) {
                         echo 'Found TestNG HTML report at test/test-output/index.html (optional: publish with HTML Publisher plugin)'
                     } else {
-                        echo 'No TestNG HTML report found'
+                        echo 'No TestNG HTML report foundd'
                     }
                 }
             }
