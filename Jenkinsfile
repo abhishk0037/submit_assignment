@@ -1,6 +1,10 @@
 pipeline {
     agent any
-    booleanParam('DEPLOY', true, 'Set to true to execute the Deploy stage (placeholder)')
+
+    parameters {
+        booleanParam(name: 'DEPLOY', defaultValue: true, description: 'Set to true to execute the Deploy stage (placeholder)')
+    }
+
     environment {
         // Jenkins server where this pipeline will run (informational)
         JENKINS_SERVER = 'http://172.18.158.193:8080/'
@@ -9,14 +13,16 @@ pipeline {
     }
 
     tools {
-        maven 'M3'
+        maven 'maven'
     }
+
     stages {
         stage('Echo Version') {
-                steps {
-                    sh 'echo Print Maven Version'
-                    sh 'mvn -version'
-                }
+            steps {
+                sh 'echo Print Maven Version'
+                sh 'mvn -version'
+            }
+        }
 
         stage('Checkout') {
             steps {
@@ -26,17 +32,13 @@ pipeline {
 
         stage('Build') {
             steps {
-                script {
-                        sh "mvn -f test/pom.xml ${env.MVN_COMMON} -DskipTests clean package"
-                    }
-                }
+                sh "mvn -f test/pom.xml ${MVN_COMMON} -DskipTests clean package"
             }
+        }
 
         stage('Test') {
             steps {
-                script {
-                        sh "mvn -f test/pom.xml ${env.MVN_COMMON} test"
-                }
+                sh "mvn -f test/pom.xml ${MVN_COMMON} test"
             }
         }
 
@@ -50,14 +52,13 @@ pipeline {
         stage('PublishReports') {
             steps {
                 // Publish JUnit/Surefire XML results and TestNG XML if present.
-                // allowEmptyResults prevents the step from failing the build if no XMLs are found.
                 junit testResults: 'test/target/surefire-reports/*.xml, test/test-output/testng-results.xml', allowEmptyResults: true
 
                 script {
                     if (fileExists('test/test-output/index.html')) {
                         echo 'Found TestNG HTML report at test/test-output/index.html (optional: publish with HTML Publisher plugin)'
                     } else {
-                        echo 'No TestNG HTML report foundd'
+                        echo 'No TestNG HTML report found'
                     }
                 }
             }
@@ -71,11 +72,7 @@ pipeline {
                 script {
                     echo "DEPLOY parameter is true. (This stage is a placeholder — implement your deployment steps.)"
                     echo "Target Jenkins server: ${env.JENKINS_SERVER}"
-                    if (isUnix()) {
-                        sh 'echo "Deployment placeholder - implement actual deployment here"'
-                    } else {
-                        bat 'echo Deployment placeholder - implement actual deployment here'
-                    }
+                    sh 'echo "Deployment placeholder - implement actual deployment here"'
                 }
             }
         }
