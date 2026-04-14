@@ -1,5 +1,6 @@
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -24,7 +25,10 @@ public class BaseTest {
     public void setup(String browser, String version, String platform, String executionMode) throws MalformedURLException {
         if (executionMode.equalsIgnoreCase("local")) {
             if (browser.equalsIgnoreCase("chrome")) {
-                driver.set(new ChromeDriver());
+                ChromeOptions chromeOptions = new ChromeOptions();
+                chromeOptions.addArguments("--headless");
+                chromeOptions.addArguments("--disable-gpu");
+                driver.set(new ChromeDriver(chromeOptions));
             } else if (browser.equalsIgnoreCase("firefox")) {
                 driver.set(new FirefoxDriver());
             } else {
@@ -51,6 +55,11 @@ public class BaseTest {
         ltOptions.put("project", "AmazonAutomation");
         ltOptions.put("build", "TestNG Parallel Run");
         ltOptions.put("name", "SearchProductTest");
+
+        // Add headless mode for Chrome
+        if (browser.equalsIgnoreCase("chrome")) {
+            ltOptions.put("headless", true);
+        }
 
         capabilities.setCapability("LT:Options", ltOptions);
         return capabilities;

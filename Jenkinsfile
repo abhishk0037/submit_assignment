@@ -5,13 +5,6 @@ pipeline {
         booleanParam(name: 'DEPLOY', defaultValue: true, description: 'Set to true to execute the Deploy stage (placeholder)')
     }
 
-    environment {
-        // Jenkins server where this pipeline will run (informational)
-        JENKINS_SERVER = 'http://172.18.158.193:8080/'
-        // Maven flags: batch mode, do not fail interactive prompts
-        MVN_COMMON = '-B'
-    }
-
     tools {
         maven 'maven'
     }
@@ -38,7 +31,7 @@ pipeline {
 
         stage('Test') {
             steps {
-                sh "mvn -f test/pom.xml ${MVN_COMMON} test"
+                sh "mvn -f test/pom.xml test"
             }
         }
 
@@ -70,8 +63,7 @@ pipeline {
             }
             steps {
                 script {
-                    echo "DEPLOY parameter is true. (This stage is a placeholder — implement your deployment steps.)"
-                    echo "Target Jenkins server: ${env.JENKINS_SERVER}"
+                    echo "DEPLOY parameter is true. (This stage is a placeholder — implement your deployment logic here.)"
                     sh 'echo "Deployment placeholder - implement actual deployment here"'
                 }
             }
@@ -80,12 +72,6 @@ pipeline {
 
     post {
         always {
-            // Attempt to publish results again (won't fail pipeline if none)
-            junit testResults: '**/target/surefire-reports/*.xml', allowEmptyResults: true
-            // Ensure artifacts are archived at least once
-            archiveArtifacts artifacts: 'test/target/**/*', allowEmptyArchive: true
-            // Clean workspace if Workspace Cleaner plugin is available
-            cleanWs()
         }
         success {
             echo 'Pipeline completed successfully.'
